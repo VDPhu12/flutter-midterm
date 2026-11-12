@@ -56,7 +56,6 @@ class DefaultFirebaseOptions {
     projectId: 'flutter-midterm-practice-e93cb',
     storageBucket: 'flutter-midterm-practice-e93cb.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAYrFSLNIlaael_6aCmNnNg3Qnk8Xw4Tec',
     appId: '1:1000946495143:ios:265ba322acf8847476f582',
@@ -65,7 +64,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'flutter-midterm-practice-e93cb.firebasestorage.app',
     iosBundleId: 'com.example.midtermReady',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyAYrFSLNIlaael_6aCmNnNg3Qnk8Xw4Tec',
     appId: '1:1000946495143:ios:265ba322acf8847476f582',
