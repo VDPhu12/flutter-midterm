@@ -1,0 +1,72 @@
+rules_version = '2';
+
+// ============================================================
+// Firestore Security Rules — Quản lý Giảng Viên
+// ============================================================
+// IMPORTANT: Replace YOUR_ADMIN_UID_HERE with the real UID
+// from Firebase Console → Authentication → Users.
+// Deploy with: firebase deploy --only firestore:rules
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Helper functions ----
+
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.uid == '0HfInCF4zjTA3ZnhIZWMpLuM9Ln1';
+    }
+
+    function hasExactlyGiangVienFields() {
+      let incoming = request.resource.data;
+      return incoming.keys().hasAll(['IDGV', 'Fullname', 'Image', 'SumClass'])
+          && incoming.keys().hasOnly(['IDGV', 'Fullname', 'Image', 'SumClass']);
+    }
+
+    function fieldsAreValidTypes() {
+      let d = request.resource.data;
+      return d.IDGV is string
+          && d.Fullname is string
+          && d.Image is string
+          && d.SumClass is int
+          && d.SumClass >= 0;
+    }
+
+    function idGVMatchesDocId(docId) {
+      return request.resource.data.IDGV == docId;
+    }
+
+    // ---- GiangVien collection ----
+
+    match /GiangVien/{idGV} {
+      // Admin can read all lecturer documents.
+      allow read: if isAdmin();
+
+      // Admin can create if:
+      //   - all 4 fields present and no extras
+      //   - types are valid
+      //   - IDGV value matches the document ID
+      allow create: if isAdmin()
+          && hasExactlyGiangVienFields()
+          && fieldsAreValidTypes()
+          && idGVMatchesDocId(idGV);
+
+      // Admin can update if:
+      //   - same 4 fields, correct types
+      //   - IDGV is not changed (immutable)
+      allow update: if isAdmin()
+          && hasExactlyGiangVienFields()
+          && fieldsAreValidTypes()
+          && request.resource.data.IDGV == resource.data.IDGV;
+
+      // Admin can delete.
+      allow delete: if isAdmin();
+    }
+
+    // Deny everything else (all other collections).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

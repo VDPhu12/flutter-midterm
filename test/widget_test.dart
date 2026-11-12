@@ -1,88 +1,110 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:midterm_ready/app/app.dart';
-import 'package:midterm_ready/data/in_memory_item_repository.dart';
-import 'package:midterm_ready/screens/item_form_screen.dart';
+import 'package:midterm_ready/data/image_service.dart';
+import 'package:midterm_ready/data/in_memory_lecturer_repository.dart';
+import 'package:midterm_ready/models/lecturer.dart';
+import 'package:midterm_ready/screens/lecturer_form_screen.dart';
+
+Lecturer _make({
+  String idGV = 'GV001',
+  String fullname = 'Test User',
+  String image = '',
+  int sumClass = 0,
+}) =>
+    Lecturer(idGV: idGV, fullname: fullname, image: image, sumClass: sumClass);
+
+Widget _buildForm({Lecturer? lecturer}) {
+  return MaterialApp(
+    home: LecturerFormScreen(
+      repository: InMemoryLecturerRepository(
+        lecturer != null ? [lecturer] : null,
+      ),
+      imageService: ImageService(),
+      lecturer: lecturer,
+    ),
+  );
+}
 
 void main() {
-  // ---------------------------------------------------------------------------
-  // App smoke test
-  // ---------------------------------------------------------------------------
-  group('MidtermApp', () {
-    testWidgets('renders item list with seeded items', (tester) async {
-      await tester.pumpWidget(MidtermApp());
+  group('LecturerFormScreen — Add mode', () {
+    testWidgets('shows Vietnamese labels', (tester) async {
+      await tester.pumpWidget(_buildForm());
       await tester.pumpAndSettle();
-
-      // The app bar title should be visible
-      expect(find.text('Items'), findsOneWidget);
-
-      // At least one seeded item card is visible
-      expect(find.text('Flutter Basics'), findsOneWidget);
+      expect(find.text('Thêm giảng viên'), findsWidgets);
+      expect(find.text('IDGV là bắt buộc.'), findsNothing);
     });
 
-    testWidgets('search filters items', (tester) async {
-      await tester.pumpWidget(MidtermApp());
+    testWidgets('validates empty IDGV', (tester) async {
+      await tester.pumpWidget(_buildForm());
       await tester.pumpAndSettle();
-
-      // Open search
-      await tester.tap(find.byIcon(Icons.search));
+      await tester.tap(find.byKey(const Key('saveButton')));
       await tester.pumpAndSettle();
-
-      // Type a search query
-      await tester.enterText(find.byType(TextField), 'null');
-      await tester.pumpAndSettle();
-
-      // Only the matching item should be visible
-      expect(find.text('Dart Null Safety'), findsOneWidget);
-      expect(find.text('Flutter Basics'), findsNothing);
+      expect(find.text('IDGV là bắt buộc.'), findsOneWidget);
     });
-  });
 
-  // ---------------------------------------------------------------------------
-  // Form validation widget tests
-  // ---------------------------------------------------------------------------
-  group('ItemFormScreen validation', () {
-    Widget buildForm() {
-      return MaterialApp(
-        home: ItemFormScreen(repository: InMemoryItemRepository()),
+    testWidgets('validates empty Fullname', (tester) async {
+      await tester.pumpWidget(_buildForm());
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('idGVField')), 'GV001');
+      await tester.tap(find.byKey(const Key('saveButton')));
+      await tester.pumpAndSettle();
+      expect(find.text('Họ và tên là bắt buộc.'), findsOneWidget);
+    });
+
+    testWidgets('no validation error when both fields filled', (tester) async {
+      await tester.pumpWidget(_buildForm());
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('idGVField')), 'GV001');
+      await tester.enterText(
+        find.byKey(const Key('fullnameField')),
+        'Nguyễn Văn A',
       );
-    }
-
-    testWidgets('shows error when title is empty on save', (tester) async {
-      await tester.pumpWidget(buildForm());
+      await tester.tap(find.byKey(const Key('saveButton')));
       await tester.pumpAndSettle();
-
-      // Tap the bottom Save button without entering a title
-      await tester.tap(find.text('Create Item'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Title is required.'), findsOneWidget);
+      expect(find.text('IDGV là bắt buộc.'), findsNothing);
+      expect(find.text('Họ và tên là bắt buộc.'), findsNothing);
     });
 
-    testWidgets('shows error when title is too short', (tester) async {
-      await tester.pumpWidget(buildForm());
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byKey(const Key('titleField')), 'A');
-      await tester.tap(find.text('Create Item'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Title must be at least 2 characters.'), findsOneWidget);
-    });
-
-    testWidgets('no error when title is valid', (tester) async {
-      await tester.pumpWidget(buildForm());
+    testWidgets('clears image when clear icon is pressed', (tester) async {
+      await tester.pumpWidget(_buildForm());
       await tester.pumpAndSettle();
 
       await tester.enterText(
-        find.byKey(const Key('titleField')),
-        'Valid Title',
+        find.byKey(const Key('imageField')),
+        'https://example.com/pic.jpg',
       );
-      await tester.tap(find.text('Create Item'));
+      await tester.pumpAndSettle();
+      expect(find.byIcon(Icons.clear), findsOneWidget);
+
+      await tester.tap(find.byIcon(Icons.clear));
       await tester.pumpAndSettle();
 
-      expect(find.text('Title is required.'), findsNothing);
-      expect(find.text('Title must be at least 2 characters.'), findsNothing);
+      final field = tester.widget<TextFormField>(
+        find.byKey(const Key('imageField')),
+      );
+      expect(field.controller?.text, isEmpty);
+    });
+  });
+
+  group('LecturerFormScreen — Edit mode', () {
+    testWidgets('IDGV field is disabled in edit mode', (tester) async {
+      final l = _make();
+      await tester.pumpWidget(_buildForm(lecturer: l));
+      await tester.pumpAndSettle();
+
+      // The IDGV field should be disabled (read-only)
+      final idField = tester.widget<TextFormField>(
+        find.byKey(const Key('idGVField')),
+      );
+      expect(idField.enabled, isFalse);
+    });
+
+    testWidgets('pre-fills existing data', (tester) async {
+      final l = _make(fullname: 'Trần Thị B', sumClass: 5);
+      await tester.pumpWidget(_buildForm(lecturer: l));
+      await tester.pumpAndSettle();
+      expect(find.text('Trần Thị B'), findsOneWidget);
+      expect(find.text('5'), findsOneWidget);
     });
   });
 }

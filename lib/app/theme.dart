@@ -1,166 +1,150 @@
 import 'package:flutter/material.dart';
 
-/// Material 3 theme for the midterm starter.
-/// Change [seedColor] to instantly re-theme the entire app.
+/// Material 3 theme — deep navy + professional university administration palette.
 class AppTheme {
   AppTheme._();
 
-  static const Color seedColor = Color(0xFF1565C0); // blue-800
+  /// Deep navy seed — change this one constant to re-theme everything.
+  static const Color seedColor = Color(0xFF0D2B55); // deep navy
 
-  // ---------------------------------------------------------------------------
-  // Light theme
-  // ---------------------------------------------------------------------------
   static ThemeData get light {
-    final colorScheme = ColorScheme.fromSeed(
+    final cs = ColorScheme.fromSeed(
       seedColor: seedColor,
       brightness: Brightness.light,
     );
     return ThemeData(
       useMaterial3: true,
-      colorScheme: colorScheme,
-      // Typography
-      textTheme: _buildTextTheme(colorScheme),
-      // AppBar
+      colorScheme: cs,
+      scaffoldBackgroundColor: const Color(0xFFF5F7FA),
+      textTheme: _textTheme(cs),
       appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: const Color(0xFF0D2B55),
+        foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: TextStyle(
-          color: colorScheme.onPrimary,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
           fontSize: 20,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.15,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.3,
         ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      // Cards
       cardTheme: CardThemeData(
-        elevation: 1,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: colorScheme.surface,
-      ),
-      // Input fields
-      inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withAlpha(80),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
-        errorStyle: TextStyle(color: colorScheme.error, fontSize: 12),
-      ),
-      // FAB
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: colorScheme.primaryContainer,
-        foregroundColor: colorScheme.onPrimaryContainer,
-        elevation: 4,
-      ),
-      // ElevatedButton
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-          minimumSize: const Size.fromHeight(48),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
-      ),
-      // SnackBar
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        backgroundColor: colorScheme.inverseSurface,
-        contentTextStyle: TextStyle(color: colorScheme.onInverseSurface),
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // Dark theme
-  // ---------------------------------------------------------------------------
-  static ThemeData get dark {
-    final colorScheme = ColorScheme.fromSeed(
-      seedColor: seedColor,
-      brightness: Brightness.dark,
-    );
-    return ThemeData(
-      useMaterial3: true,
-      colorScheme: colorScheme,
-      textTheme: _buildTextTheme(colorScheme),
-      appBarTheme: AppBarTheme(
-        backgroundColor: colorScheme.surface,
-        foregroundColor: colorScheme.onSurface,
         elevation: 0,
-        centerTitle: false,
-        titleTextStyle: TextStyle(
-          color: colorScheme.onSurface,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      cardTheme: CardThemeData(
-        elevation: 1,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: BorderSide(color: const Color(0xFF0D2B55).withAlpha(25)),
+        ),
+        color: Colors.white,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        filled: true,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFCBD5E0)),
         ),
-        errorStyle: TextStyle(color: colorScheme.error, fontSize: 12),
-      ),
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: colorScheme.primaryContainer,
-        foregroundColor: colorScheme.onPrimaryContainer,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFFCBD5E0)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Color(0xFF0D2B55), width: 2),
+        ),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
+        errorStyle: TextStyle(color: cs.error, fontSize: 12),
+        labelStyle: const TextStyle(fontSize: 14),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-          minimumSize: const Size.fromHeight(48),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          backgroundColor: const Color(0xFF0D2B55),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(120, 44),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 0,
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: const Color(0xFF0D2B55),
+          side: const BorderSide(color: Color(0xFF0D2B55)),
+          minimumSize: const Size(120, 44),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        backgroundColor: const Color(0xFF1A3A6B),
+        contentTextStyle: const TextStyle(color: Colors.white),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: Color(0xFF0D2B55),
+        foregroundColor: Colors.white,
+        elevation: 2,
+      ),
+      dataTableTheme: DataTableThemeData(
+        headingRowColor: WidgetStateProperty.all(const Color(0xFF0D2B55)),
+        headingTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: 13,
+        ),
+        dataRowColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const Color(0xFFE8EEF7);
+          }
+          return null;
+        }),
+        dataTextStyle: const TextStyle(fontSize: 13, color: Color(0xFF2D3748)),
+        columnSpacing: 24,
+        horizontalMargin: 16,
+        dividerThickness: 1,
+      ),
+      dividerTheme: const DividerThemeData(
+        color: Color(0xFFE2E8F0),
+        thickness: 1,
+        space: 0,
       ),
     );
   }
 
-  static TextTheme _buildTextTheme(ColorScheme scheme) {
+  static TextTheme _textTheme(ColorScheme cs) {
     return TextTheme(
-      headlineMedium: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: scheme.onSurface,
+      headlineLarge: const TextStyle(
+        fontSize: 26,
+        fontWeight: FontWeight.w800,
+        color: Color(0xFF0D2B55),
       ),
-      titleLarge: TextStyle(
+      headlineMedium: const TextStyle(
         fontSize: 22,
-        fontWeight: FontWeight.w600,
-        color: scheme.onSurface,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF0D2B55),
       ),
-      titleMedium: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        color: scheme.onSurface,
+      titleLarge: const TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        color: Color(0xFF1A202C),
       ),
-      bodyLarge: TextStyle(fontSize: 16, color: scheme.onSurface),
-      bodyMedium: TextStyle(fontSize: 14, color: scheme.onSurfaceVariant),
-      labelLarge: TextStyle(
-        fontSize: 14,
+      titleMedium: const TextStyle(
+        fontSize: 15,
         fontWeight: FontWeight.w600,
-        color: scheme.onSurface,
+        color: Color(0xFF1A202C),
+      ),
+      bodyLarge: const TextStyle(fontSize: 15, color: Color(0xFF2D3748)),
+      bodyMedium: TextStyle(fontSize: 13, color: cs.onSurfaceVariant),
+      labelLarge: const TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: Color(0xFF1A202C),
       ),
     );
   }

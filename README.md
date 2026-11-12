@@ -1,110 +1,82 @@
-# Midterm Ready — Flutter Starter
+# Ứng Dụng Quản Lý Giảng Viên (Flutter & Firebase)
 
-A clean, minimal Flutter starter built with **Material 3** and **zero external dependencies** (beyond the Flutter SDK itself). Built as a reusable scaffold for a university cross-platform mobile development midterm.
+Hệ thống quản lý giảng viên (ADMIN) đa nền tảng (Web & Android) xây dựng bằng Flutter kết hợp Firebase Authentication và Cloud Firestore.
+
+Tài liệu chi tiết và hướng dẫn nộp bài xem tại: [BAOCAO.md](BAOCAO.md)
 
 ---
 
-## Project Structure
+## 1. Cấu trúc thư mục
 
 ```
 lib/
-├── main.dart                     ← Entry point
+├── main.dart                          # Khởi tạo Firebase, runApp
+├── firebase_options.dart              # Cấu hình Firebase Web & Android
 ├── app/
-│   ├── app.dart                  ← Root MaterialApp + repository wiring
-│   └── theme.dart                ← Material 3 light/dark themes
+│   ├── app.dart                       # Root MaterialApp, điều hướng theo trạng thái auth
+│   └── theme.dart                     # Material 3 theme, tông màu deep navy
 ├── models/
-│   └── item.dart                 ← Generic Item model (id, title, description, createdAt)
+│   └── lecturer.dart                  # Model Lecturer (IDGV, Fullname, Image, SumClass)
 ├── data/
-│   ├── item_repository.dart      ← Abstract repository interface
-│   └── in_memory_item_repository.dart  ← In-memory impl with 5 seed items
+│   ├── auth_service.dart              # Xử lý đăng nhập / đăng xuất Firebase Auth
+│   ├── lecturer_repository.dart       # Interface repository
+│   ├── firestore_lecturer_repository.dart  # Firestore CRUD thật với collection 'GiangVien'
+│   ├── in_memory_lecturer_repository.dart  # Repository bộ nhớ tạm phục vụ unit test
+│   └── image_service.dart             # Xử lý chọn ảnh (image_picker), nén JPEG và Base64
 ├── screens/
-│   ├── item_list_screen.dart     ← List + search + empty state + FAB
-│   ├── item_form_screen.dart     ← Add / Edit form with validation
-│   └── item_detail_screen.dart   ← Read-only detail view
+│   ├── login_screen.dart              # Màn hình đăng nhập quản trị
+│   ├── lecturer_list_screen.dart      # Danh sách, dashboard, tìm kiếm, sắp xếp, lọc, xuất JSON
+│   ├── lecturer_form_screen.dart      # Form thêm / chỉnh sửa giảng viên, preview ảnh
+│   └── lecturer_detail_screen.dart    # Chi tiết giảng viên
 └── widgets/
-    └── item_card.dart            ← Reusable card for list items
-
-test/
-├── repository_test.dart          ← Unit tests for repository + model
-└── widget_test.dart              ← Widget tests for app smoke + form validation
+    └── lecturer_avatar.dart           # Widget hiển thị ảnh linh hoạt (URL / Base64 / Placeholder)
 ```
 
 ---
 
-## How to Run
-
-### Prerequisites
-- Flutter 3.x stable (tested with 3.47.9)
-- An Android emulator or physical device connected, **or** run on Windows desktop
-
-### Commands
+## 2. Các lệnh thực thi
 
 ```bash
-# Get dependencies (already resolved — only flutter SDK itself)
+# Cài đặt thư viện
 flutter pub get
 
-# Run on a connected device or emulator
-flutter run
+# Chạy trên trình duyệt Web (Chrome)
+flutter run -d chrome
 
-# Run all tests
+# Chạy trên Android Emulator
+flutter run -d emulator-5554
+
+# Chạy toàn bộ test
 flutter test --reporter=expanded
 
-# Analyze for lint issues
+# Kiểm tra phân tích mã nguồn
 flutter analyze
 
-# Build a debug APK for Android
+# Build bản Web
+flutter build web
+
+# Build bản Android debug APK
 flutter build apk --debug
 ```
 
 ---
 
-## Features
+## 3. Schema Firestore (`GiangVien`)
 
-| Feature | Status |
-|---|---|
-| Item list with 5 seeded items | ✅ |
-| Search (title + description, case-insensitive) | ✅ |
-| Empty state with helpful message | ✅ |
-| Add item (form + validation) | ✅ |
-| Edit item | ✅ |
-| Delete item with confirmation dialog | ✅ |
-| SnackBar feedback on add / edit / delete | ✅ |
-| Item detail screen | ✅ |
-| Material 3 light + dark theme | ✅ |
-| No Firebase / no external packages | ✅ |
+Đảm bảo đúng 4 trường theo yêu cầu của đề bài:
+
+| Tên trường | Kiểu dữ liệu | Mô tả |
+|---|---|---|
+| `IDGV` | String | Mã giảng viên (khóa chính, trùng với Document ID) |
+| `Fullname` | String | Họ và tên giảng viên |
+| `Image` | String | URL ảnh hoặc chuỗi Base64 Data URI |
+| `SumClass` | Integer | Tổng số lớp giảng dạy (>= 0) |
 
 ---
 
-## Dependencies
+## 4. Bảo mật Firestore (Security Rules)
 
-| Package | Purpose |
-|---|---|
-| `flutter` SDK | Everything — UI, Material 3 |
-| `cupertino_icons` | iOS-style icons (bundled by default) |
-| `flutter_test` | Testing framework |
-| `flutter_lints` | Recommended lint rules |
-
-No `provider`, no `riverpod`, no `get_it`, no Firebase. Pure Flutter.
-
----
-
-## Architecture
-
-```
-main.dart
-  └── MidtermApp (app.dart)
-        └── InMemoryItemRepository (injected via constructor)
-              └── ItemListScreen
-                    ├── ItemCard (widget)
-                    ├── ItemFormScreen (push)
-                    └── ItemDetailScreen (push)
-                          └── ItemFormScreen (push from detail)
-```
-
-The repository is passed down through constructors — simple, explicit, and easy to understand. When the assignment requires Firebase or SQLite, you only change `app.dart` to swap the repository implementation.
-
----
-
-## Adapting to Your Assignment
-
-See **MIDTERM_GUIDE.md** for step-by-step instructions on renaming the domain (products, students, tasks, books) and swapping the backend.
+Quy tắc bảo mật mẫu nằm tại `firestore.rules`.
+- Chỉ tài khoản Admin (UID định sẵn) mới có quyền đọc/ghi.
+- Bắt buộc kiểm tra chỉ có đúng 4 trường `IDGV`, `Fullname`, `Image`, `SumClass` và kiểm tra kiểu dữ liệu.
+- `IDGV` không thể bị sửa đổi sau khi tạo.
